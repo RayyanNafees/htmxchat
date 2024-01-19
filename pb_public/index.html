@@ -7,52 +7,44 @@
     <link rel="stylesheet" href="https://unpkg.com/@picocss/pico" />
     <script src="https://unpkg.com/htmx.org"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
     <script src="https://unpkg.com/handlebars/dist/handlebars.min.js"></script>
+
     <link rel="stylesheet" href="./chat.css" />
   </head>
-  <body>
-    <article style="margin: 0" class="msgbox">
+  <body hx-ext="json-enc">
+    <article style="margin: 0" class="msgbox" hx-ext="client-side-templates">
       <header>
         <hgroup>
           <h2>HTMxChat</h2>
           <p>11 participants</p>
         </hgroup>
       </header>
-      <div class="chatarea">
-        <button class="msg received contrast" disabled>
-          <hgroup class="name">
-            <h1>Rayyanoooooooooooooooooooooooooooop</h1>
-          </hgroup>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda in
-          blanditiis, eaque provident aperiam vitae quidem fugiat numquam alias
-          dolorem beatae, repudiandae eum ipsa explicabo hic suscipit commodi
-          ipsam consequuntur.
-        </button>
-        <button class="msg sent secondary" disabled>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet
-          minus ab odio, commodi, totam magnam sunt officiis laborum officia eum
-          a perferendis! Excepturi aliquam non maiores, voluptatibus magni
-          explicabo beatae.
-        </button>
-        <button class="msg sent secondary" disabled>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet
-          minus ab odio, commodi, totam magnam sunt officiis laborum officia eum
-          a perferendis! Excepturi aliquam non maiores, voluptatibus magni
-          explicabo beatae.
-        </button>
-        <button class="msg sent secondary" disabled>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet
-          minus ab odio, commodi, totam magnam sunt officiis laborum officia eum
-          a perferendis! Excepturi aliquam non maiores, voluptatibus magni
-          explicabo beatae.
-        </button>
-      </div>
+      <div class="chatarea"></div>
       <footer>
         <div class="inputbox">
-          <input placeholder="Enter your Text" />
-          <button class="send">Send</button>
+          <input id="text" name="text" placeholder="Enter your Text" />
+          <button
+            class="send"
+            hx-post="/api/collections/messages/records"
+            hx-include="#text"
+            hx-vals="js:{sender:{id:'1234', name:'Other guy'}}"
+            hx-target=".chatarea"
+            hx-swap="beforeend"
+            handlebars-template="msg"
+          >
+            Send
+          </button>
         </div>
       </footer>
     </article>
+    <template id="msg">
+      <button class="msg sent contrast" disabled>
+        <hgroup class="name">
+          <h1>{{sender.name}}</h1>
+        </hgroup>
+        {{text}}
+      </button>
+    </template>
   </body>
 </html>
