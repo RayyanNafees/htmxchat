@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Counter</title>
+    <script src="https://unpkg.com/htmx.org"></script>
+    <script src="https://unpkg.com/handlebars/dist/handlebars.min.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/client-side-templates"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/sse.js"></script>
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@picocss/pico@1.5.11/css/pico.min.css"
+    />
+    <script>
+      const data = () =>
+        JSON.stringify({
+          action: 'create', // create, update or delete,
+          record: {
+            collectionName: 'counters',
+            count: 123,
+          },
+        })
+    </script>
+    <!-- <script type="module">
+      import Pocketbase from 'https://esm.sh/pocketbase'
+      const pb = new Pocketbase()
+      pb.collection('counters').subscribe(
+        '*',
+        function (e) {
+          console.log(e.action)
+          console.log(e.record)
+        },
+        {
+          /* other options like expand, custom headers, etc. */
+        }
+      )
+    </script> -->
+  </head>
+  <body>
+    <main class="container">
+      <article hx-ext="sse" sse-connect="/api/realtime">
+        Count:
+        <div
+          sse-swap="PB_CONNECT"
+          hx-ext="client-side-templates"
+          handlebars-template="foo"
+        ></div>
+
+        <table>
+          <thead>
+            <th>Action</th>
+            <th>ID</th>
+            <th>count</th>
+          </thead>
+          <tbody
+            sse-swap="counters/*"
+            hx-ext="client-side-templates"
+            handlebars-template="bar"
+          ></tbody>
+        </table>
+
+        <button
+          class="outline"
+          hx-post="/api/realtime"
+          hx-include="#clientId"
+          hx-vals="js:{subscriptions:['counters/*']}"
+        >
+          Subscribe
+        </button>
+      </article>
+    </main>
+    <template id="foo">
+      <input name="clientId" type="hidden" id="clientId" value="{{clientId}}" />
+    </template>
+    <template id="bar">
+      <tr>
+        <td>{{action}}</td>
+        <td>{{record.id}}</td>
+        <td>{{record.count}}</td>
+      </tr>
+    </template>
+  </body>
+</html>
